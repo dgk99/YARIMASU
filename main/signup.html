@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <link rel="stylesheet" href="main_style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>회원가입</h1>
+        <p class="subtitle">새 계정을 만들어 주세요</p>
+        <div class="form-group">
+            <input type="text" id="newUserId" placeholder="아이디를 입력해 주세요">
+            <input type="password" id="newPassword" placeholder="비밀번호를 입력해 주세요">
+            <input type="text" id="userName" placeholder="이름을 입력해 주세요">
+            <select id="userGender">
+                <option value="">성별을 선택해 주세요</option>
+                <option value="남성">남성</option>
+                <option value="여성">여성</option>
+                <option value="기타">기타</option>
+                <option value="아파치 헬리콥터">아파치 헬리콥터</option>
+            </select>
+            <input type="number" id="userAge" placeholder="나이를 입력해 주세요">
+            <input type="number" id="userHeight" placeholder="키(cm)를 입력해 주세요">
+            <input type="number" id="userWeight" placeholder="몸무게(kg)를 입력해 주세요">
+        </div>
+        <div class="buttons">
+            <button class="btn signup" onclick="registerUser()">회원가입 완료</button>
+            <button class="btn back" onclick="goBack()">취소</button>
+        </div>
+        <p id="signupMessage" class="message"></p>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

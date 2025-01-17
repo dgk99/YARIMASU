@@ -1,0 +1,261 @@
+/* 공통 스타일 설정 */
+body {
+    font-family: Arial, sans-serif; /* 기본 폰트 설정 */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* 화면 중앙에 배치 */
+    align-items: center;
+    height: 100vh; /* 화면 전체 높이 사용 */
+    background-color: #f4f4f4; /* 배경색 설정 */
+}
+
+/* 컨테이너 스타일: 기본 화면 레이아웃 */
+.container {
+    text-align: center; /* 텍스트 가운데 정렬 */
+    background: white; /* 배경색 설정 */
+    padding: 20px 40px; /* 내부 여백 */
+    border-radius: 10px; /* 모서리 둥글게 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+    width: 400px; /* 컨테이너 너비 */
+}
+
+/* 헤더 스타일 */
+h1 {
+    font-size: 2em; /* 제목 크기 설정 */
+    margin-bottom: 10px; /* 아래 여백 */
+    color: #333; /* 글자색 */
+}
+
+/* 부제목 스타일 */
+.subtitle {
+    font-size: 1.2em; /* 부제목 크기 */
+    color: #777; /* 글자 색상 설정 */
+    margin-bottom: 30px; /* 아래 여백 */
+}
+
+/* 입력 필드 및 셀렉트박스 스타일 */
+.form-group input, .form-group select {
+    display: block; /* 블록 요소로 설정 */
+    width: 100%; /* 가로 전체 사용 */
+    padding: 10px; /* 내부 여백 */
+    margin: 10px 0; /* 위아래 여백 */
+    border: 1px solid #ccc; /* 테두리 색상 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    font-size: 1em; /* 글자 크기 */
+    box-sizing: border-box; /* 전체 크기에 패딩 포함 */
+}
+
+/* 버튼 그룹 스타일 */
+.buttons {
+    display: flex; /* 플렉스박스 사용 */
+    flex-direction: column; /* 세로 방향 배치 */
+    gap: 10px; /* 버튼 간격 */
+}
+
+/* 버튼 기본 스타일 */
+.btn {
+    padding: 10px; /* 내부 여백 */
+    border: none; /* 테두리 제거 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    font-size: 1em; /* 글자 크기 */
+    cursor: pointer; /* 마우스 커서 변경 */
+}
+
+/* 회원가입 버튼 스타일 */
+.btn.signup {
+    background-color: #3b82f6; /* 파란색 배경 */
+    color: white; /* 흰색 글자 */
+}
+
+/* 뒤로가기 버튼 스타일 */
+.btn.back {
+    background-color: #e5e5e5; /* 회색 배경 */
+    color: #333; /* 글자색 */
+}
+
+/* 버튼 호버 시 투명도 조정 */
+.btn:hover {
+    opacity: 0.9; /* 약간 투명해짐 */
+}
+
+/* 메시지 출력 스타일 */
+.message {
+    margin-top: 20px; /* 위 여백 */
+    font-size: 1em; /* 글자 크기 */
+    color: red; /* 빨간색 글자 */
+    font-weight: bold; /* 굵게 표시 */
+}
+
+/* 링크 그룹 스타일 */
+.links {
+    margin-top: 20px; /* 위 여백 */
+    text-align: center; /* 가운데 정렬 */
+}
+
+/* 링크 스타일 */
+.links .link {
+    color: #1d4ed8; /* 파란색 글자 */
+    text-decoration: underline; /* 밑줄 추가 */
+    font-size: 1em; /* 글자 크기 */
+    cursor: pointer; /* 마우스 커서 변경 */
+}
+
+/* 링크 호버 시 스타일 */
+.links .link:hover {
+    color: #3b82f6; /* 밝은 파란색 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+/* 링크 구분 기호 */
+.links span {
+    margin: 0 10px; /* 좌우 여백 */
+    color: #333; /* 회색 글자 */
+}
+
+/* 비밀번호 입력 필드 컨테이너 */
+.password-container {
+    display: flex; /* 플렉스박스 사용 */
+    align-items: center; /* 수직 가운데 정렬 */
+    position: relative; /* 위치 조정 가능 */
+}
+
+/* 비밀번호 입력 필드 */
+.password-container input {
+    flex: 1; /* 남은 공간 채움 */
+}
+
+/* 비밀번호 표시/숨기기 버튼 */
+.toggle-password {
+    position: absolute; /* 입력 필드 내부에서 위치 설정 */
+    right: 10px; /* 오른쪽 여백 */
+    background: none; /* 배경 제거 */
+    border: none; /* 테두리 제거 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 1.2em; /* 글자 크기 */
+    color: #777; /* 글자 색상 */
+}
+
+/* 비밀번호 표시/숨기기 버튼 호버 */
+.toggle-password:hover {
+    color: #000; /* 검정색으로 변경 */
+}
+
+/* 관리자 페이지 컨테이너 확장 */
+.container.wide {
+    width: 800px; /* 관리자 페이지 컨테이너 폭 */
+}
+
+/* 테이블 스타일 */
+table {
+    width: 100%; /* 테이블 전체 너비 사용 */
+    border-collapse: collapse; /* 테두리 겹침 제거 */
+    margin: 20px 0; /* 위아래 여백 */
+}
+
+/* 테이블 헤더와 셀 스타일 */
+table th, table td {
+    border: 1px solid #ccc; /* 테두리 색상 */
+    padding: 10px; /* 내부 여백 */
+    text-align: left; /* 왼쪽 정렬 */
+}
+
+/* 테이블 헤더 스타일 */
+table th {
+    background-color: #f4f4f4; /* 연한 회색 배경 */
+    text-align: center; /* 가운데 정렬 */
+}
+
+/* 수정 폼 컨테이너 */
+.edit-form-container {
+    background: #fff; /* 흰색 배경 */
+    border: 1px solid #ccc; /* 테두리 색상 */
+    border-radius: 10px; /* 모서리 둥글게 */
+    padding: 20px; /* 내부 여백 */
+    position: fixed; /* 화면 고정 */
+    top: 50%; /* 화면 중앙 */
+    left: 50%; /* 화면 중앙 */
+    transform: translate(-50%, -50%); /* 중앙 정렬 */
+    z-index: 10; /* 다른 요소 위에 표시 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+    width: 400px; /* 폼 너비 */
+}
+
+/* 수정 폼 헤더 스타일 */
+.edit-form-container h2 {
+    margin-bottom: 20px; /* 아래 여백 */
+}
+
+/* 수정 폼 레이블 스타일 */
+.edit-form-container label {
+    display: block; /* 블록 요소로 설정 */
+    margin: 10px 0 5px; /* 여백 설정 */
+}
+
+/* 수정 폼 입력 필드 및 셀렉트박스 */
+.edit-form-container input,
+.edit-form-container select {
+    width: 100%; /* 입력 필드 너비 */
+    padding: 8px; /* 내부 여백 */
+    margin-bottom: 10px; /* 아래 여백 */
+    border: 1px solid #ccc; /* 테두리 색상 */
+    border-radius: 5px; /* 모서리 둥글게 */
+}
+
+/* 수정 폼 버튼 스타일 */
+.edit-form-container .btn {
+    width: 48%; /* 버튼 폭 */
+    padding: 10px; /* 내부 여백 */
+    margin: 5px; /* 버튼 간격 */
+}
+
+/* 수정 저장 버튼 */
+.edit-form-container .btn.save {
+    background-color: #4CAF50; /* 녹색 배경 */
+    color: white; /* 흰색 글자 */
+}
+
+/* 수정 취소 버튼 */
+.edit-form-container .btn.cancel {
+    background-color: #f44336; /* 빨간색 배경 */
+    color: white; /* 흰색 글자 */
+}
+
+/* 삭제 버튼 스타일 */
+.btn.delete {
+    background-color: #f44336; /* 빨간색 배경 */
+    color: white; /* 흰색 글자 */
+    border: none; /* 테두리 제거 */
+    padding: 5px 10px; /* 내부 여백 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    border-radius: 5px; /* 모서리 둥글게 */
+}
+
+/* 삭제 버튼 호버 스타일 */
+.btn.delete:hover {
+    opacity: 0.8; /* 약간 투명해짐 */
+}
+
+/* 아이디 찾기 문구 추가 */
+.message {
+    margin-top: 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #333;
+}
+
+.id-list {
+    margin-top: 10px;
+    list-style-type: none;
+    padding: 0;
+}
+
+.id-list li {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 1em;
+}
