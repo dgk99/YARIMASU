@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이디 찾기</title>
+    <link rel="stylesheet" href="main_style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>아이디 찾기</h1>
+        <p class="subtitle">이름을 입력해 주세요</p>
+        <div class="form-group">
+            <input type="text" id="findName" placeholder="이름을 입력해 주세요">
+        </div>
+        <div class="buttons">
+            <button class="btn find-id" onclick="findId()">아이디 찾기</button>
+            <button class="btn back" onclick="goBack()">취소</button>
+        </div>
+        <p id="resultMessage" class="message"></p> <!-- 결과 메시지 -->
+        <ul id="idList" class="id-list"></ul> <!-- 아이디 리스트 -->
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지</title>
+    <link rel="stylesheet" href="main_style.css">
+</head>
+<body onload="loadMembers()">
+    <div class="container wide">
+        <h1>관리자 페이지</h1>
+        <p class="subtitle">회원 가입한 사용자 목록</p>
+        <table id="membersTable" border="1">
+            <thead>
+                <tr>
+                    <th>아이디</th>
+                    <th>비밀번호</th>
+                    <th>이름</th>
+                    <th>성별</th>
+                    <th>나이</th>
+                    <th>키(cm)</th>
+                    <th>몸무게(kg)</th>
+                    <th>가입 날짜</th>
+                    <th>수정</th>
+                    <th>삭제</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 회원 데이터가 여기에 표시됩니다 -->
+            </tbody>
+        </table>
+        <button class="btn back" onclick="goBack()">로그아웃</button>
+    </div>
+    <div id="editForm" class="edit-form-container" style="display:none;">
+        <h2>회원 정보 수정</h2>
+        <form onsubmit="saveEdit(event)">
+            <label for="editPassword">비밀번호:</label>
+            <input type="text" id="editPassword" required>
+            <label for="editName">이름:</label>
+            <input type="text" id="editName" required>
+            <label for="editGender">성별:</label>
+            <select id="editGender">
+                <option value="남성">남성</option>
+                <option value="여성">여성</option>
+                <option value="기타">기타</option>
+            </select>
+            <label for="editAge">나이:</label>
+            <input type="number" id="editAge" required>
+            <label for="editHeight">키(cm):</label>
+            <input type="number" id="editHeight" required>
+            <label for="editWeight">몸무게(kg):</label>
+            <input type="number" id="editWeight" required>
+            <button type="submit" class="btn save">저장</button>
+            <button type="button" class="btn cancel" onclick="cancelEdit()">취소</button>
+        </form>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

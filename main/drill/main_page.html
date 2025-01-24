@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>두근두근 신체 측정</title>
+    <link rel="stylesheet" href="main_style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>두근두근 신체 측정</h1>
+        <p class="subtitle">Team YARIMASU</p>
+        
+        <!-- 로그인 폼 시작 -->
+        <form action="login_process.php" method="POST">
+            <div class="form-group">
+                <input type="text" id="userId" name="username" placeholder="아이디를 입력해 주세요" required>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" placeholder="비밀번호를 입력해 주세요" required>
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">👁️</button>
+                </div>
+            </div>
+            <div class="buttons">
+                <button type="submit" class="btn login">로그인</button>
+            </div>
+        </form>
+        <!-- 로그인 폼 끝 -->
+    
+        <div class="buttons">
+            <button class="btn signup" onclick="goToSignup()">회원가입</button>
+        </div>
+        <div class="links">
+            <a href="find_id.html" class="link">아이디 찾기</a>
+            <span>|</span>
+            <a href="find_password.html" class="link">비밀번호 찾기</a>
+        </div>
+        <p id="message" class="message"></p>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>
