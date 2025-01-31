@@ -42,10 +42,28 @@ $conn->close();
     <p>이름: <?php echo $이름; ?></p>
     <p>나이: <?php echo $나이; ?></p>
     <p>성별: <?php echo $성별; ?></p>
-    <p>키: <?php echo $키; ?></p>
+    <p>키: <?php echo $키; ?>cm</p>
+
+
+    <!-- 회원 정보 수정 버튼 -->
+    <a href="edit_profile.php">
+        <button type="button">회원 정보 수정</button>
+    </a>
 
     <form action="userpage.php" method="POST">
         <button type="submit" name="logout">로그아웃</button>
     </form>
+
+        <!-- 회원 탈퇴 버튼 (JavaScript 확인창 추가) -->
+        <button type="button" onclick="confirmDelete()">회원 탈퇴</button>
+
+    <script>
+        function confirmDelete() {
+            if (confirm("정말로 회원 탈퇴를 하시겠습니까? 탈퇴 후에는 복구할 수 없습니다.")) {
+                location.href = 'delete_account.php';
+            }
+        }
+    </script>
+
 </body>
 </html>

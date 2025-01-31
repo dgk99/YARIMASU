@@ -35,7 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } else {
         // 로그인 실패
-        echo "회원번호가 유효하지 않습니다.";
+        echo "회원번호가 유효하지 않습니다. 로그인 화면으로 돌아갑니다.";
+        // 1초 후 로그인 화면으로 복귀귀
+        header("refresh:1;url=login.html");
     }
 
     $stmt->close();
