@@ -13,8 +13,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 비밀번호 암호화 (보안을 위해 반드시 필요)
     $hashed_pass = password_hash($user_pass, PASSWORD_DEFAULT); 
 
-    // 데이터베이스 연결 (별도 파일 없이 직접 설정)
-    $conn = new mysqli("localhost", "kmg", "12345", "yarimasu");
+    // 네트워크 연결결
+    $host = 'localhost';
+    $user = 'kmg';
+    $password = '12345';
+    $database = 'yarimasu';
+
+    // 2. 데이터베이스 연결
+    $conn = new mysqli($host, $user, $password, $database);
 
     if ($conn->connect_error) { 
         die("데이터베이스 연결 실패: " . $conn->connect_error);

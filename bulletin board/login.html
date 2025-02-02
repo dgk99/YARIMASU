@@ -3,28 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 페이지</title> <!-- 여기에는 "로그인 페이지" 같은 제목을 넣으면 좋아 -->
+    <title>로그인</title>
 </head>
 <body>
 
-    <!-- 로그인 폼 -->
-    <form action="login.php" method="POST"> <!-- action에는 로그인 처리를 담당할 PHP 파일명을, method에는 보안이 필요한 로그인이라면 POST를 넣으면 좋아 -->
-        
-        <!-- 사용자 아이디 입력 -->
-        <label for="user_id">아이디:</label> <!-- label의 for 속성과 input의 id 속성을 맞춰주면 좋음 -->
-        <input type="text" id="user_id" name="user_id" required> <!-- name 속성에는 PHP에서 받을 변수명을 넣으면 좋아 -->
-        <br>
-        <!-- 비밀번호 입력 -->
-        <label for="user_pass">비밀번호:</label> <!-- label을 통해 사용자가 쉽게 알아볼 수 있도록 -->
-        <input type="password" id="user_pass" name="user_pass" required> <!-- 비밀번호이므로 type="password"를 사용 -->
-        <br>
-        <!-- 로그인 버튼 -->
-        <button type="submit">로그인</button> <!-- 버튼 타입은 "submit", 버튼 텍스트는 "로그인"이 적당함 -->
+    <h2>로그인</h2>
 
+    <form action="login.php" method="POST">
+        <label for="user_id">아이디:</label>
+        <input type="text" id="user_id" name="user_id" required>
+
+        <label for="user_pass">비밀번호:</label>
+        <input type="password" id="user_pass" name="user_pass" required>
+
+        <button type="submit">로그인</button>
     </form>
 
-    <!-- 회원가입 링크 -->
-    <p>아직 회원이 아니신가요? <a href="signup.html">회원가입</a></p> <!-- 회원가입 페이지의 파일명을 넣으면 좋아 -->
+    <p>아직 회원이 아니신가요? <a href="signup.html">회원가입</a></p>
 
 </body>
 </html>
