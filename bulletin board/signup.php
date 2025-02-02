@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 비밀번호 암호화 (보안을 위해 반드시 필요)
     $hashed_pass = password_hash($user_pass, PASSWORD_DEFAULT); 
 
-    // 네트워크 연결결
+    // 네트워크 연결
     $host = 'localhost';
     $user = 'kmg';
     $password = '12345';

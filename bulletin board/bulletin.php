@@ -1,5 +1,6 @@
 <?php
-session_start();
+
+include 'db_connect.php';
 
 // 로그아웃 처리
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["logout"])) {
@@ -9,22 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["logout"])) {
     exit();
 }
 
-// 로그인 확인
-if (!isset($_SESSION["user_id"])) {
-    header("Location: login.html");
-    exit();
-}
 
-// 데이터베이스 연결
-$host = 'localhost';
-$user = 'kmg';
-$password = '12345';
-$database = 'yarimasu';
-
-$conn = new mysqli($host, $user, $password, $database);
-if ($conn->connect_error) {
-    die("데이터베이스 연결 실패: " . $conn->connect_error);
-}
 
 // 게시글 목록을 가져오는 SQL 쿼리
 $sql = "SELECT *, 

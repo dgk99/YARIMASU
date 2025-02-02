@@ -1,21 +1,6 @@
 <?php
-session_start();
-date_default_timezone_set('Asia/Seoul');
 
-if (!isset($_SESSION["user_id"])) {
-    header("Location: login.html");
-    exit();
-}
-
-$host = 'localhost';
-$user = 'kmg';
-$password = '12345';
-$database = 'yarimasu';
-
-$conn = new mysqli($host, $user, $password, $database);
-if ($conn->connect_error) {
-    die("데이터베이스 연결 실패: " . $conn->connect_error);
-}
+include 'db_connect.php';
 
 $post_id = $_GET['id'];
 

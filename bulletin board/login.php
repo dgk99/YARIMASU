@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($user_pass, $row["user_pass"])) {
             $_SESSION["user_id"] = $row["user_id"];
-            $_SESSION["user_role"] = $row["user_role"]; // 관리자 권한 저장
+            $_SESSION["user_role"] = $row["user_role"];
 
             header("Location: bulletin.php");
             exit();

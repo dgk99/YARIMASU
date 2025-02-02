@@ -1,20 +1,6 @@
 <?php
-session_start();
 
-if (!isset($_SESSION["user_id"])) {
-    header("Location: login.html");
-    exit();
-}
-
-$host = 'localhost';
-$user = 'kmg';
-$password = '12345';
-$database = 'yarimasu';
-
-$conn = new mysqli($host, $user, $password, $database);
-if ($conn->connect_error) {
-    die("데이터베이스 연결 실패: " . $conn->connect_error);
-}
+include 'db_connect.php';
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("잘못된 접근입니다.");
