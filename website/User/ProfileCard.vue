@@ -10,14 +10,10 @@ onMounted(() => {
     const allUsers = JSON.parse(localStorage.getItem("users")) || [];
     const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser")) || null;
 
-    console.log("✅ 저장된 users:", allUsers);
-    console.log("✅ 현재 로그인한 사용자:", loggedInUser);
-
     if (loggedInUser) {
         userData.value = allUsers.find(user => user.email === loggedInUser.email) || {};
     }
 
-    console.log("✅ 최종 userData:", userData.value);
 });
 
 
@@ -28,7 +24,15 @@ const startEdit = () => {
 
 // 완료 버튼을 누르면 localstorage에 저장 후 p 태그로 변경
 const saveChanges = () => {
-    localStorage.setItem("users", JSON.stringify(userData.value));
+    let allUsers = JSON.parse(localStorage.getItem("users")) || [];
+    
+    const userIndex = allUsers.findIndex(user => user.email === userData.value.email);
+    if (userIndex !== -1) {
+        allUsers[userIndex] = { ...userData.value };
+        localStorage.setItem("users", JSON.stringify(allUsers));
+    }
+
+    localStorage.setItem("loggedInUser", JSON.stringify(userData.value));
     isEditing.value = false;
 };
 
@@ -49,6 +53,13 @@ const cancelEdit = () => {
             <p>생년월일: {{ userData.birth_date }}</p>
             <p>키: {{ userData.height }}</p>
             <p>성별: {{ userData.gender }}</p>
+
+                    <!-- 첫 등록 사진 -->
+            <div v-if="userData.first_photo">
+                <h3>첫 등록 사진</h3>
+                <img :src="userData.first_photo" alt="첫 등록 사진" style="max-width: 150px;">
+            </div>
+
             <button @click="startEdit">수정</button>
         </div>
         <!-- 수정하기 버튼을 누르면 폼 으로 변경 -->

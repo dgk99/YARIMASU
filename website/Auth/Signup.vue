@@ -33,25 +33,19 @@ const register_complete = () => {
         return; // 🚨 회원가입 중단
     }
 
-    // LocalStorage에서 기존 회원 데이터 가져오기
-    const existingUser = JSON.parse(localStorage.getItem("users")) || [];
+    let existingUsers = JSON.parse(localStorage.getItem("users")) || [];
 
-    // 입력한 이메일이 존재하는지 중복 검사
-    const isEmailExist = existingUser.find(user => user.email === email.value);
-    // 이미 존재하면 경고 메시지
-    if (isEmailExist){
-        alert("이미 존재하는 이메일입니다. 다른 이메일을 사용해주세요");
-        return; // 중복이므로 재입력 요구
-    }
-
-    // LocalStorage에서 기존 회원 데이터 가져오기
-    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-
-    // 🚨 기존 데이터가 배열인지 확인하고, 배열이 아니면 초기화
     if (!Array.isArray(existingUsers)) {
-        console.error("users 데이터가 배열이 아님! 강제로 배열로 초기화합니다.");
-        localStorage.setItem("users", JSON.stringify([])); // 배열로 초기화
+        console.error("users 데이터가 배열이 아닙니다! 강제로 배열로 초기화합니다.");
+        existingUsers = [];
     }
+
+    const isEmailExist = existingUsers.find(user => user.email === email.value);
+    if (isEmailExist) {
+        alert("이미 존재하는 이메일입니다. 다른 이메일을 사용해주세요");
+        return;
+    }
+
 
     // 새 회원 정보 추가 (ID 자동 증가)
     const newUserId = existingUsers.length > 0 ? existingUsers[existingUsers.length - 1].id + 1 : 1;

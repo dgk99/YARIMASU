@@ -21,25 +21,13 @@ const login_check = () => {
         // 입력한 이메일과 비밀번호가 일치하는 사용자 찾기
         const login_result = storedUsers.find(user => user.email === email.value && user.password === password.value);
 
-        if (login_result){
-            // 로그인 성공 -> 토큰 생성
-            const token = `token_${login_result.id}_${new Date().getTime()}_${Math.random().toString(36).substr(2, 9)}`;
+        if (login_result) {
+            // 로그인한 사용자 정보 저장
+            localStorage.setItem("loggedInUser", JSON.stringify(login_result));
 
-            // 로그인한 사용자 정보 저장 (id, token 포함)
-            const loggedInUser = {
-                id: login_result.id,
-                email: login_result.email,
-                name: login_result.name,
-                token: token
-            };
-
-            localStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
-
-            // 사용자 페이지로 이동
-            alert("로그인 성공!!")
-            router.push('/UserPage');
+            alert("로그인 성공!!");
+            router.push('/UserPage'); // 사용자 페이지로 이동
         } else {
-            // 로그인 실패 -> 경고 메시지 & 재입력 요구
             alert('존재하지 않는 유저입니다.');
             email.value = '';
             password.value = '';
