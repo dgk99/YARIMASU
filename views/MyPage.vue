@@ -30,12 +30,22 @@
       <!-- 저장 버튼 (수정 중일 때만 표시) -->
       <button v-if="isEditing" @click="updateProfile" class="save-btn">저장</button>
 
+      <!-- 로그아웃 버튼 -->
+      <button class="logout-btn" @click="logout">로그아웃</button>
+
       <h3>첫 등록 사진</h3>
       <img v-if="user.first_photo" :src="`http://210.101.236.158:5000/uploads/${user.first_photo}`" width="150" />
 
       <h3>업로드한 사진</h3>
-      <div v-if="user.photos && user.photos.length">
-        <div v-for="photo in user.photos" :key="photo.id">
+      <div v-if="Object.keys(photoGroups).length">
+        <div v-for="(photos, date) in photoGroups" :key="date">
+          <button @click="selectedDate = date">{{ date }}</button>
+        </div>
+      </div>
+
+      <h3>선택한 날짜의 사진</h3>
+      <div v-if="selectedDate && photoGroups[selectedDate]">
+        <div v-for="photo in photoGroups[selectedDate]" :key="photo.id">
           <img :src="`http://210.101.236.158:5000/uploads/${photo.filename}`" width="100" />
           <button @click="deletePhoto(photo.id)">삭제</button>
         </div>
@@ -56,9 +66,11 @@ import axios from "axios";
 export default {
   data() {
     return {
-      user: null, // 🔥 기본값 null
+      user: null,
       newPhoto: null,
-      isEditing: false, // 🔥 기본적으로 편집 불가능
+      isEditing: false,
+      photoGroups: {}, // ✅ 연도-월-일 그룹화된 사진 데이터
+      selectedDate: null, // ✅ 선택된 날짜
     };
   },
   async mounted() {
@@ -80,12 +92,18 @@ export default {
 
         if (response.data) {
           this.user = response.data;
+          
+          // ✅ birthdate 값이 올바르게 표시되도록 확인
+          if (!this.user.birthdate || this.user.birthdate === "0000-00-00") {
+            this.user.birthdate = "2000-01-01"; // 기본값
+          }
 
-          // ✅ NULL 값 방지: 값이 없을 경우 기본값 설정
-          this.user.birthdate = this.user.birthdate || "2000-01-01"; // 기본값: 2000년 1월 1일
-          this.user.gender = this.user.gender || "남성"; // 기본값: 남성
+          this.user.gender = this.user.gender || "남성";
+          
+          // ✅ 사진 데이터 그룹화
+          this.groupPhotosByDate(response.data.photos);
         } else {
-          this.user = {}; // ✅ 빈 객체로 설정해서 오류 방지
+          this.user = {};
         }
       } catch (error) {
         console.error("마이페이지 로딩 오류:", error);
@@ -93,6 +111,17 @@ export default {
         this.$router.push("/login");
       }
     },
+
+    groupPhotosByDate(photos) {
+      const grouped = {};
+      photos.forEach(photo => {
+        const date = photo.filename.split("_")[0]; // YYYY-MM-DD 형식 추출
+        if (!grouped[date]) grouped[date] = [];
+        grouped[date].push(photo);
+      });
+      this.photoGroups = grouped;
+    },
+
     async updateProfile() {
       try {
         const token = localStorage.getItem("token");
@@ -104,14 +133,28 @@ export default {
         }, { headers: { Authorization: `Bearer ${token}` } });
 
         alert("정보가 수정되었습니다.");
-        this.isEditing = false; // 🔥 수정 모드 종료
+        this.isEditing = false;
       } catch (error) {
         alert("정보 수정 실패!");
       }
     },
-    handleFileUpload(event) {
-      this.newPhoto = event.target.files[0];
+
+    async logout() {
+      localStorage.removeItem("token");
+      alert("로그아웃 되었습니다.");
+      this.$router.push("/login");
     },
+
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.newPhoto = file; 
+        console.log("선택한 파일:", file.name); // ✅ 선택한 파일 확인
+      } else {
+        this.newPhoto = null;
+      }
+    },
+
     async uploadPhoto() {
       if (!this.newPhoto) return alert("사진을 선택하세요!");
 
@@ -130,6 +173,7 @@ export default {
         alert("사진 업로드 실패!");
       }
     },
+
     async deletePhoto(photoId) {
       try {
         const token = localStorage.getItem("token");
@@ -142,6 +186,7 @@ export default {
         alert("사진 삭제 실패!");
       }
     },
+
     async deleteAccount() {
       if (!confirm("정말로 탈퇴하시겠습니까?")) return;
 
@@ -161,38 +206,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.mypage-container {
-  width: 400px;
-  margin: auto;
-  text-align: center;
-}
-
-.edit-btn {
-  background-color: blue;
-  color: white;
-  padding: 8px;
-  margin-top: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.save-btn {
-  background-color: green;
-  color: white;
-  padding: 8px;
-  margin-top: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.delete-btn {
-  background-color: red;
-  color: white;
-  padding: 8px;
-  margin-top: 20px;
-  border: none;
-  cursor: pointer;
-}
-</style>
