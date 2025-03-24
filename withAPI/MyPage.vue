@@ -67,13 +67,13 @@ const fetchPhotos = async () => {
   }
 };
 
-// ✅ 2. 날짜별 그룹화 (년-월-일 시:분:초)
+// ✅ 2. 날짜별 그룹화
 const groupedPhotos = computed(() => {
   const grouped = {};
-  
+
   photos.value.forEach(photo => {
     const date = new Date(photo.uploaded_at);
-    const formattedDate = date.toISOString().replace("T", " ").substring(0, 19); // "년-월-일 시:분:초" 형식
+    const formattedDate = date.toLocaleDateString("sv-SE"); // ✅ 여기 이렇게 바꿔야 함
 
     if (!grouped[formattedDate]) grouped[formattedDate] = [];
     grouped[formattedDate].push(photo);
@@ -87,6 +87,8 @@ const uploadPhoto = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
+  console.log("📸 [사진 업로드 시작]:", file.name);  // ✅ 업로드 시작 로그 추가
+
   const formData = new FormData();
   formData.append("photo", file);
   formData.append("user_email", user.value.email);
@@ -96,46 +98,52 @@ const uploadPhoto = async (event) => {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    // ✅ 새로 추가된 사진을 즉시 반영
-    const uploadedAt = new Date(response.data.uploaded_at).toISOString().replace("T", " ").substring(0, 19);
+    console.log("📸 [서버 응답]:", response.data);
 
+    // ✅ 업로드된 사진을 즉시 반영
+    const uploadedAt = new Date(response.data.uploaded_at).toISOString().replace("T", " ").substring(0, 19);
     const newPhoto = {
       id: response.data.id,
       photo_url: response.data.photoUrl,
-      uploaded_at: uploadedAt,
+      uploaded_at: response.data.uploaded_at,
     };
 
     photos.value.push(newPhoto);
-    console.log("✅ 새 사진 추가됨:", newPhoto);
+    console.log("✅ [현재 photos 배열]:", photos.value);  // ✅ photos 배열 확인
 
-    selectedDate.value = uploadedAt; // ✅ 추가된 날짜 선택
+    selectedDate.value = uploadedAt;
   } catch (error) {
-    console.error("사진 업로드 오류:", error);
+    console.error("❌ 사진 업로드 오류:", error);
   }
 };
 
 // ✅ 4. 날짜별 사진 삭제
 const deletePhotosByDate = async (date) => {
   try {
-    console.log(`🚀 [삭제 요청] 날짜: ${date}`);
-    
-    await axios.delete(`http://210.101.236.158.nip.io:5002/api/photos/delete-by-date/${user.value.email}/${date}`);
+    console.log(`🚀 [삭제 요청] 원본 날짜: ${date}`);
 
-    // ✅ 해당 날짜의 사진을 필터링해서 삭제
+    // ✅ 날짜 그대로 사용 (변환 X)
+    const formattedDate = date;
+    console.log(`✅ 변환된 날짜 형식: ${formattedDate}`);
+
+    const apiUrl = `http://210.101.236.158.nip.io:5002/api/photos/delete-by-date/${user.value.email}/${formattedDate}`;
+    console.log("🛠️ DELETE 요청 URL:", apiUrl);
+
+    const response = await axios.delete(apiUrl);
+    console.log("✅ [삭제 완료] 서버 응답:", response.data);
+
+    // ✅ 프론트엔드에서도 삭제된 데이터 반영
     photos.value = photos.value.filter(photo => {
-      const photoDate = new Date(photo.uploaded_at).toISOString().replace("T", " ").substring(0, 19);
-      return photoDate !== date;
+      const photoDate = new Date(photo.uploaded_at).toLocaleDateString("sv-SE");
+      return photoDate !== formattedDate;
     });
 
-    console.log(`✅ [삭제 완료] ${date}의 사진 삭제됨`);
-    
-    // ✅ 삭제 후 다른 날짜 선택
-    const remainingDates = Object.keys(groupedPhotos.value);
-    selectedDate.value = remainingDates.length > 0 ? remainingDates[0] : "";
+    console.log(`✅ [삭제 후 photos 배열]:`, photos.value);
   } catch (error) {
     console.error("❌ 날짜별 사진 삭제 오류:", error);
   }
 };
+
 
 // ✅ 5. 로그아웃
 const logout = () => {
