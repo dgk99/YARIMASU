@@ -1,38 +1,38 @@
 <template>
   <div class="mypage-container">
     <h1>마이페이지</h1>
-    <img :src="user.photoUrl" class="profile-img" v-if="user.photoUrl" />
     <p>이메일: {{ user.email }}</p>
-    <p>이름: {{ user.name }}</p>
 
     <div class="content-container">
-      <!-- ✅ 날짜별 리스트 -->
-      <div class="photo-list">
-        <h2>Photo List</h2>
-
-        <div v-for="(photos, date) in groupedPhotos" :key="date" class="date-item">
-          <button @click="selectedDate = date" :class="{ active: selectedDate === date }">
-            {{ date }}
-          </button>
-          <button @click.stop="deletePhotosByDate(date)" class="delete-btn">삭제</button>
-        </div>
-
-        <button class="add-btn" @click="triggerFileInput">+</button>
-        <input type="file" ref="fileInput" @change="uploadPhoto" style="display: none;">
+      <!-- ✅ 왼쪽: 처음 찍은 사진 (대표 사진) -->
+      <div class="fixed-photo-box">
+        <h2>처음 찍은 사진</h2>
+        <img :src="getPhotoUrl(user.photoUrl)" class="fixed-photo" v-if="user.photoUrl" />
       </div>
 
-      <!-- ✅ 선택한 날짜의 사진만 표시 -->
-      <div class="photo-view">
-        <h2 v-if="selectedDate">{{ selectedDate }}</h2>
-        <div class="photo-grid" v-if="groupedPhotos[selectedDate]">
-          <div v-for="photo in groupedPhotos[selectedDate]" :key="photo.id" class="photo-item">
-            <img :src="getPhotoUrl(photo.photo_url)" class="photo" />
-          </div>
+      <!-- ✅ 가운데: 선택한 날짜의 사진 1장 -->
+      <div class="selected-photo-box">
+        <h2>사진</h2>
+        <div v-if="selectedDate && groupedPhotos[selectedDate]?.length > 0">
+          <img :src="getPhotoUrl(groupedPhotos[selectedDate][0].photo_url)" class="photo" />
         </div>
+        <div v-else>
+          <p>해당 날짜에 사진이 없습니다.</p>
+        </div>
+      </div>
+
+      <!-- ✅ 오른쪽: 날짜 목록 + 삭제 + 업로드 -->
+      <div class="date-list">
+        <h2>목록</h2>
+        <div v-for="(photos, date) in groupedPhotos" :key="date" class="date-item">
+          <button @click="selectedDate = date" :class="{ active: selectedDate === date }">{{ date }}</button>
+          <button @click.stop="deletePhotosByDate(date)" class="delete-btn">삭제</button>
+        </div>
+        <button class="add-btn" @click="triggerFileInput">+</button>
+        <input type="file" ref="fileInput" @change="uploadPhoto" style="display: none;" />
       </div>
     </div>
 
-    <!-- ✅ 로그아웃 -->
     <button class="logout-btn" @click="logout">로그아웃</button>
   </div>
 </template>
@@ -55,7 +55,7 @@ const fetchPhotos = async () => {
     const response = await axios.get(`http://210.101.236.158.nip.io:5002/api/photos/by-date/${user.value.email}/all`);
     
     console.log("📸 서버 응답 데이터:", response.data);
-    photos.value = response.data;
+    photos.value = response.data.filter(photo => photo.is_first !== 1);
 
     // 최신 날짜로 기본 선택
     const dates = Object.keys(groupedPhotos.value);
@@ -111,7 +111,9 @@ const uploadPhoto = async (event) => {
     photos.value.push(newPhoto);
     console.log("✅ [현재 photos 배열]:", photos.value);  // ✅ photos 배열 확인
 
-    selectedDate.value = uploadedAt;
+    // ✅ 업로드된 날짜를 selectedDate로 설정 (추가)
+    selectedDate.value = new Date(newPhoto.uploaded_at).toLocaleDateString("sv-SE");
+
   } catch (error) {
     console.error("❌ 사진 업로드 오류:", error);
   }
@@ -160,7 +162,11 @@ const triggerFileInput = () => {
 
 // ✅ 7. 사진 URL 처리
 const getPhotoUrl = (photoUrl) => {
-  if (!photoUrl) return ""; 
+  if (!photoUrl) return "";
+
+  // ❌ Google 이미지면 무시
+  if (photoUrl.startsWith("https://lh3.googleusercontent.com")) return "";
+
   return photoUrl.startsWith("http")
     ? photoUrl
     : `http://210.101.236.158.nip.io:5002${photoUrl}`;
@@ -176,18 +182,40 @@ onMounted(() => {
 });
 
 // ✅ 8. 사용자 정보 불러오기
+// 기존 user 설정 로직에서 photoUrl 제거
 const fetchUserData = () => {
-  console.log("🚀 fetchUserData 실행됨!");
-  
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
   if (storedUser) {
-    console.log("✅ 로컬스토리지에서 가져온 사용자 데이터:", storedUser);
-    user.value = storedUser;
-  } else {
-    console.error("❌ 로컬스토리지에서 사용자 정보를 찾을 수 없음!");
+    user.value.email = storedUser.email;
+    user.value.name = storedUser.name;
+    // ✅ photoUrl은 무시하고, 아래에서 따로 불러옴
   }
 };
+
+// ✅ 대표 사진은 무조건 따로 불러오기
+const fetchFirstPhoto = async () => {
+  try {
+    const res = await axios.get(`http://210.101.236.158.nip.io:5002/api/user/first-photo/${user.value.email}`);
+    user.value.photoUrl = res.data.photoUrl;
+  } catch (err) {
+    console.warn("대표 사진 없음 → 숨김 처리");
+    user.value.photoUrl = ""; // 아무것도 안 보이게
+  }
+
+  console.log("📨 대표 사진 요청 email:", user.value.email);ß
+};
+
+onMounted(async () => {
+  fetchUserData(); // ✅ 로컬 유저 정보 먼저 불러오고
+
+  await fetchFirstPhoto(); // ✅ 대표 사진 바로 불러오기
+
+  setTimeout(() => {
+    fetchPhotos(); // ✅ 그 다음에 날짜별 사진 불러오기
+  }, 300);
+});
+
 </script>
 
 <style>
@@ -195,69 +223,70 @@ const fetchUserData = () => {
   text-align: center;
   margin-top: 20px;
 }
-.profile-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-}
 
 .content-container {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 20px;
 }
 
-/* ✅ 날짜 리스트 스타일 */
-.photo-list {
-  width: 250px;
-  border-right: 2px solid #ccc;
-  padding-right: 10px;
+.fixed-photo-box,
+.selected-photo-box,
+.date-list {
+  width: 30%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* 대표 사진 */
+.fixed-photo {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border: 2px solid #ccc;
+}
+
+/* 가운데 사진 */
+.photo {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border: 2px solid #ccc;
 }
 
 .date-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 5px 0;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.photo-list button {
-  background: #f5f5f5;
-  border: 1px solid #ccc;
-  padding: 5px;
-  margin: 5px 0;
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
+.date-item button {
+  margin-right: 5px;
 }
 
-.photo-list button.active {
-  background: red;
+.date-item .active {
+  background-color: red;
   color: white;
 }
 
 .delete-btn {
   background-color: red;
   color: white;
-  padding: 5px;
   border: none;
+  padding: 3px 6px;
   cursor: pointer;
 }
 
 .add-btn {
-  font-size: 20px;
-  padding: 10px;
-  display: block;
-  width: 100%;
+  margin-top: 10px;
+  font-size: 18px;
+  padding: 5px 10px;
 }
 
-.photo-view {
-  flex: 1;
-  padding-left: 10px;
-}
-
-.photo-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+.logout-btn {
+  margin-top: 30px;
+  padding: 8px 16px;
 }
 </style>

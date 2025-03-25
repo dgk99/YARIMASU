@@ -50,27 +50,29 @@ app.post("/api/auth/google", async (req, res) => {
   }
 
   try {
-    // ✅ Google API를 사용하여 사용자 정보 가져오기
+    // ✅ 1. Google 사용자 정보 요청
     const userInfoResponse = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
     const userInfo = await userInfoResponse.json();
+    const userEmail = userInfo.email;
 
     console.log("✅ Google 사용자 정보:", userInfo);
 
-    const userEmail = userInfo.email;
-    const photoUrl = userInfo.picture || "";
+    // ✅ 2. kmg_api 테이블에 사진은 업로드할 때만 저장. 여기서는 안 저장함.
+    // (회원 여부 확인만 하고 아무 작업 안 함)
+    const [rows] = await db.query("SELECT 1 FROM kmg_api WHERE user_email = ? LIMIT 1", [userEmail]);
 
-    // ✅ 1. 기존 회원 여부 확인 (`kmg_api` 테이블 사용)
-    const [rows] = await db.query("SELECT * FROM kmg_api WHERE user_email = ?", [userEmail]);
-
-    if (rows.length === 0) {
-      // ✅ 2. 회원이 없으면 `kmg_api`에 추가
-      await db.query(
-        "INSERT INTO kmg_api (user_email, photo_url) VALUES (?, ?)",
-        [userEmail, photoUrl]
-      );
+    // ✅ 3. 대표 사진 가져오기 (있을 경우만)
+    let fixedPhoto = "";
+    const [firstPhoto] = await db.query(
+      "SELECT photo_url FROM kmg_api WHERE user_email = ? AND is_first = 1 LIMIT 1",
+      [userEmail]
+    );
+    if (firstPhoto.length > 0) {
+      fixedPhoto = firstPhoto[0].photo_url;
     }
 
-    res.json({ email: userEmail, photoUrl });
+    // ✅ 4. 프론트로 응답
+    res.json({ email: userEmail}); // ← 대표 사진만 넘김
 
   } catch (error) {
     console.error("Google 로그인 오류:", error);
@@ -96,16 +98,48 @@ app.post("/api/photos/add", upload.single("photo"), async (req, res) => {
   try {
     console.log(`🚀 [사진 업로드 요청] 이메일: ${user_email}, 파일: ${photoUrl}, 업로드 시간: ${uploadedAt}`);
 
-    const [result] = await db.query(
-      "INSERT INTO kmg_api (user_email, photo_url, uploaded_at) VALUES (?, ?, ?)",
-      [user_email, photoUrl, uploadedAt]
+    // ✅ 대표 사진 존재 여부 확인
+    const [existingFirstPhoto] = await db.query(
+      "SELECT 1 FROM kmg_api WHERE user_email = ? AND is_first = 1 LIMIT 1",
+      [user_email]
     );
-    console.log(`✅ [DB 저장 완료] 반영된 행 수: ${result.affectedRows}`);
 
-    res.json({ success: true, photoUrl, uploaded_at: uploadedAt });
+    const isFirst = existingFirstPhoto.length === 0 ? 1 : 0;
+
+    // ✅ 사진 저장
+    const [result] = await db.query(
+      "INSERT INTO kmg_api (user_email, photo_url, is_first, uploaded_at) VALUES (?, ?, ?, ?)",
+      [user_email, photoUrl, isFirst, uploadedAt]
+    );
+
+    console.log(`✅ [DB 저장 완료] is_first=${isFirst}, 반영된 행 수: ${result.affectedRows}`);
+
+    res.json({ success: true, photoUrl, uploaded_at: uploadedAt, is_first: isFirst });
   } catch (error) {
     console.error("❌ 사진 업로드 오류:", error);
     res.status(500).json({ success: false, message: "서버 오류" });
+  }
+});
+
+// ✅ 처음 찍은 사진 등록용
+app.post("/api/photos/first", upload.single("photo"), async (req, res) => {
+  const { user_email } = req.body;
+  const photoUrl = `/uploads/${req.file.filename}`;
+  const uploadedAt = moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss");
+
+  try {
+    // 기존 대표 사진 삭제 (중복 방지)
+    await db.query("DELETE FROM kmg_api WHERE user_email = ? AND is_first = 1", [user_email]);
+
+    const [result] = await db.query(
+      "INSERT INTO kmg_api (user_email, photo_url, is_first, uploaded_at) VALUES (?, ?, 1, ?)",
+      [user_email, photoUrl, uploadedAt]
+    );
+
+    res.json({ success: true, photoUrl, uploaded_at: uploadedAt });
+  } catch (error) {
+    console.error("대표 사진 업로드 오류:", error);
+    res.status(500).json({ success: false, message: "대표 사진 등록 실패" });
   }
 });
 
@@ -159,6 +193,20 @@ app.get("/api/photos/by-date/:user_email/:date", async (req, res) => {
   } catch (error) {
     console.error("사진 조회 오류:", error);
     res.status(500).json({ success: false, message: "서버 오류" });
+  }
+});
+
+app.get("/api/user/first-photo/:email", async (req, res) => {
+  const { email } = req.params;
+  const [rows] = await db.query(
+    "SELECT photo_url FROM kmg_api WHERE user_email = ? AND is_first = 1 LIMIT 1",
+    [email]
+  );
+
+  if (rows.length > 0) {
+    res.json({ photoUrl: rows[0].photo_url });
+  } else {
+    res.status(404).json({ message: "대표 사진 없음" });
   }
 });
 
