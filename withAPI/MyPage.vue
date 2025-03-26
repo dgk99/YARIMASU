@@ -5,9 +5,11 @@
 
     <div class="content-container">
       <!-- ✅ 왼쪽: 처음 찍은 사진 (대표 사진) -->
+      <!-- ✅ 왼쪽: 처음 찍은 사진 (대표 사진) -->
       <div class="fixed-photo-box">
         <h2>처음 찍은 사진</h2>
         <img :src="getPhotoUrl(user.photoUrl)" class="fixed-photo" v-if="user.photoUrl" />
+        <input type="file" @change="uploadFirstPhoto" />
       </div>
 
       <!-- ✅ 가운데: 선택한 날짜의 사진 1장 -->
@@ -34,6 +36,7 @@
     </div>
 
     <button class="logout-btn" @click="logout">로그아웃</button>
+    <button @click="deleteAccount">회원 탈퇴</button>
   </div>
 </template>
 
@@ -119,6 +122,29 @@ const uploadPhoto = async (event) => {
   }
 };
 
+// 처음 등록 사진
+const uploadFirstPhoto = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("photo", file);
+  formData.append("user_email", user.value.email);
+
+  try {
+    const response = await axios.post("http://210.101.236.158.nip.io:5002/api/photos/first", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    user.value.photoUrl = response.data.photoUrl;
+    alert("대표 사진이 등록되었습니다.");
+  } catch (error) {
+    console.error("❌ 대표 사진 업로드 오류:", error);
+    alert("대표 사진 등록에 실패했습니다.");
+  }
+};
+
+
 // ✅ 4. 날짜별 사진 삭제
 const deletePhotosByDate = async (date) => {
   try {
@@ -144,8 +170,24 @@ const deletePhotosByDate = async (date) => {
   } catch (error) {
     console.error("❌ 날짜별 사진 삭제 오류:", error);
   }
+  await fetchFirstPhoto(); // 삭제 후 대표 사진 다시 불러오기
 };
 
+// ✅ 9. 회원 탈퇴
+const deleteAccount = async () => {
+  if (!confirm("정말 탈퇴하시겠습니까? 모든 사진이 삭제됩니다.")) return;
+
+  try {
+    const res = await axios.delete(`http://210.101.236.158.nip.io:5002/api/user/delete/${user.value.email}`);
+    alert("회원 탈퇴가 완료되었습니다.");
+
+    localStorage.removeItem("user");
+    window.location.href = "/"; // 홈으로 이동
+  } catch (error) {
+    console.error("❌ 회원 탈퇴 실패:", error);
+    alert("회원 탈퇴에 실패했습니다.");
+  }
+};
 
 // ✅ 5. 로그아웃
 const logout = () => {

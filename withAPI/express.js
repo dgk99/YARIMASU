@@ -149,25 +149,28 @@ app.delete("/api/photos/delete-by-date/:email/:date", async (req, res) => {
 
   try {
     console.log(`🚀 [삭제 요청] 이메일: ${email}, 날짜: ${date}`);
-
-    // ✅ MySQL에서 삭제 쿼리 실행
+    
+    // 날짜와 is_first 모두 정확하게 조건 걸기
     const result = await db.query(
-      "DELETE FROM kmg_api WHERE user_email = ? AND DATE(uploaded_at) = ?",
+      `DELETE FROM kmg_api 
+      WHERE user_email = ? 
+      AND is_first = 0 
+      AND DATE_FORMAT(uploaded_at, '%Y-%m-%d') = ?`,  // 날짜만 비교
       [email, date]
     );
 
     if (result[0].affectedRows > 0) {
-      console.log(`✅ 삭제 완료: ${date}의 사진 삭제됨`);
-      return res.json({ success: true, message: "사진 삭제 완료" });
+      console.log(`✅ 삭제 완료: ${date}의 일반 사진 삭제됨`);
+      return res.json({ success: true, message: "일반 사진 삭제 완료" });
     } else {
-      console.log("❌ 삭제할 사진 없음");
-      return res.status(404).json({ success: false, message: "삭제할 사진이 없습니다." });
+      console.log("❌ 삭제할 일반 사진 없음");
+      return res.status(404).json({ success: false, message: "삭제할 일반 사진이 없습니다." });
     }
   } catch (error) {
     console.error("❌ 사진 삭제 오류:", error);
     return res.status(500).json({ success: false, message: "서버 오류" });
   }
-}); 
+});
 
 // ✅ 4. 특정 날짜별 사진 조회 API
 // ✅ 특정 날짜 또는 전체 사진 조회 API
@@ -210,6 +213,26 @@ app.get("/api/user/first-photo/:email", async (req, res) => {
   }
 });
 
+// ✅ 회원 탈퇴 API
+app.delete("/api/user/delete/:email", async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    // 사용자의 모든 데이터 삭제 (사진 포함)
+    const [result] = await db.query("DELETE FROM kmg_api WHERE user_email = ?", [email]);
+
+    if (result.affectedRows > 0) {
+      console.log(`✅ 회원 탈퇴 완료: ${email}`);
+      res.json({ success: true, message: "회원 탈퇴 완료" });
+    } else {
+      console.log(`❌ 탈퇴할 데이터 없음: ${email}`);
+      res.status(404).json({ success: false, message: "해당 사용자가 존재하지 않습니다." });
+    }
+  } catch (error) {
+    console.error("❌ 회원 탈퇴 오류:", error);
+    res.status(500).json({ success: false, message: "서버 오류" });
+  }
+});
 
 // 서버 실행
 app.listen(5002, () => {
