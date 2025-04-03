@@ -1,29 +1,18 @@
 <template>
-    <div class="date-list">
-      <h2>목록</h2>
-      <div
-        v-for="(photos, date) in groupedPhotos"
-        :key="date"
-        class="date-item"
-      >
-        <button @click="$emit('select-date', date)" :class="{ active: selectedDate === date }">{{ date }}</button>
-        <button @click.stop="$emit('delete-date', date)" class="delete-btn">삭제</button>
-      </div>
-  
-      <button class="add-btn" @click="$emit('capture')">📸 일반 사진 촬영</button>
-  
-      <!-- 선택된 날짜 사진 보여주기 -->
-      <div class="selected-photo-box">
-        <h2>사진</h2>
-        <div v-if="selectedDate && groupedPhotos[selectedDate]?.length > 0">
-          <img :src="getPhotoUrl(groupedPhotos[selectedDate][0].photo_url)" class="photo" />
-        </div>
-        <div v-else>
-          <p>해당 날짜에 사진이 없습니다.</p>
-        </div>
-      </div>
+  <div class="date-list">
+    <h2>목록</h2>
+    <div
+      v-for="(photos, date) in groupedPhotos"
+      :key="date"
+      class="date-item"
+    >
+      <button @click="$emit('select-date', date)" :class="{ active: selectedDate === date }">{{ date }}</button>
+      <button @click.stop="$emit('delete-date', date)" class="delete-btn">삭제</button>
     </div>
-  </template>
+
+    <button class="add-btn" @click="$emit('capture')">📸 일반 사진 촬영</button>
+  </div>
+</template>
   
   <script setup>
   const props = defineProps({
